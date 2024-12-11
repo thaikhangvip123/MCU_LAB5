@@ -22,6 +22,7 @@
 #define OK 11
 
 #define MAX_BUFFER_SIZE 30
+#define MAX_CMD_SIZE 5
 
 extern uint8_t temp;
 extern uint8_t buffer[MAX_BUFFER_SIZE];

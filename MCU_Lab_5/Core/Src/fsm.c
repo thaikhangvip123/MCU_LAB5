@@ -14,7 +14,7 @@ uint8_t buffer_flag = 0;
 
 int status = INIT;
 uint8_t cmd_flag = INIT;
-uint8_t cmd_data[5];
+uint8_t cmd_data[MAX_CMD_SIZE];
 uint8_t cmd_data_index = 0;
 int ADC_value = 0;
 
@@ -41,8 +41,7 @@ void command_parser_fsm(ADC_HandleTypeDef* hadc1, UART_HandleTypeDef* huart2) {
 		case READING:
 			// start to update cmd_data
 			if(temp != '!' && temp != '#') {
-				cmd_data[cmd_data_index] = temp;
-				cmd_data_index++;
+				cmd_data[cmd_data_index++] = temp;
 				// invalid input
 				if(cmd_data_index > 3) {
 					status = STOP;
@@ -57,14 +56,14 @@ void command_parser_fsm(ADC_HandleTypeDef* hadc1, UART_HandleTypeDef* huart2) {
 			break;
 		case STOP:
 			// check if valid command RST
-			if (isCmdEqualToRST(cmd_data)==1){
+			if (isCmdEqualToRST(cmd_data) == 1){
 				cmd_flag = RST;
 				ADC_value = HAL_ADC_GetValue(hadc1);
 				HAL_UART_Transmit(huart2, (void *)str, sprintf(str, "!ADC=%d#\r\n",ADC_value), 500);
 				setTimer1(3000); // delay 3s to wait for command '!OK'
 			}
 			// check if valid command OK
-			else if (isCmdEqualToOK(cmd_data)==1){
+			else if (isCmdEqualToOK(cmd_data) == 1){
 				cmd_flag = OK;
 			}
 			status = INIT;
